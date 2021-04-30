@@ -44,14 +44,13 @@ public class ProductController {
 	@PutMapping("{id}")
 	public ResponseEntity<Product> putProductById(@RequestBody Product product, @PathVariable int id){
 		Optional<Product> p1 = repository.findById(id);
-		Product p2 = null;
 		
 		if(p1.isPresent()) {
-			p2 = p1.get();
-			p2 = product;
+			product.setId(id);
+			p1 = Optional.of(product);
 		}
-		
-		return new ResponseEntity<Product>(p2, HttpStatus.OK);
+		repository.save(p1.get());
+		return new ResponseEntity<Product>(p1.get(), HttpStatus.OK);
 	}
 	
 	@PutMapping
@@ -61,53 +60,54 @@ public class ProductController {
 		Product p2 = null;
 		if(p1.isPresent()) {
 			p2 = p1.get();
+			product.setId(p1.get().getId());
 			p2 = product;
 		}
-		
+		repository.save(p2);
 		return new ResponseEntity<Product>(p2, HttpStatus.CREATED);
 	}
 	
 	@PatchMapping("{id}")
 	public ResponseEntity<Product> patchProductById(@RequestBody Product product, @PathVariable int id){
-		Optional<Product> p1 = repository.findById(id);
-		Product p2 = null;
+Optional<Product> p1 = repository.findById(id);
 		
 		if(p1.isPresent()) {
-			p2 = p1.get();
-			p2 = product;
+			product.setId(id);
+			p1 = Optional.of(product);
 		}
-		
-		return new ResponseEntity<Product>(p2, HttpStatus.CREATED);
+		repository.save(p1.get());
+		return new ResponseEntity<Product>(p1.get(), HttpStatus.OK);
 	}
 	
 	@PatchMapping
 	public ResponseEntity<Product> patchProduct(@RequestBody Product product){
-		
 		Optional<Product> p1 = repository.findById(product.getId());
-
 		Product p2 = null;
 		if(p1.isPresent()) {
 			p2 = p1.get();
+			product.setId(p1.get().getId());
 			p2 = product;
 		}
+		repository.save(p2);
 		return new ResponseEntity<Product>(p2, HttpStatus.CREATED);
 	}	
 	
 
 	@PostMapping
 	public ResponseEntity<Product> saveProduct(@RequestBody Product product) {
+		repository.save(product);
 		return new ResponseEntity<Product>(product, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("{id}")
 	public ResponseEntity<Integer> deleteProduct(@PathVariable int id) {
 		repository.delete(repository.findById(id).get());
-		return new ResponseEntity<Integer>(id, HttpStatus.NO_CONTENT);
+		return new ResponseEntity<Integer>(id, HttpStatus.OK);
 	}
 	
 	@DeleteMapping
 	public ResponseEntity<String> deleteProduct() {
 		repository.deleteAll();
-		return new ResponseEntity<String>("All products deleted", HttpStatus.NO_CONTENT);
+		return new ResponseEntity<String>("All products deleted", HttpStatus.OK);
 	}
 }
